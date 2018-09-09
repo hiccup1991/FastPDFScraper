@@ -59,6 +59,8 @@
             // chkMultiResult
             // 
             this.chkMultiResult.AutoSize = true;
+            this.chkMultiResult.Checked = true;
+            this.chkMultiResult.CheckState = System.Windows.Forms.CheckState.Checked;
             this.chkMultiResult.Location = new System.Drawing.Point(229, 225);
             this.chkMultiResult.Name = "chkMultiResult";
             this.chkMultiResult.Size = new System.Drawing.Size(81, 17);

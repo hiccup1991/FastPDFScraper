@@ -59,6 +59,9 @@ namespace FastPDFScraper
         {
             try
             {
+                progressBar.Value = 0;
+                currentPage = 0;
+                progressBar.Refresh();
                 if (pdfFiles == null || pdfFiles.Length == 0 || keyFile == null) return;
                 string text = System.IO.File.ReadAllText(keyFile);
                 string[] keys = text.Split(',');
@@ -119,15 +122,39 @@ namespace FastPDFScraper
 
         private void backgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            MessageBox.Show("Finish");
+            progressBar.Value = 100;
+            List<Record> newResult = result.OrderBy(c => c.Key).ThenBy(c => c.FileName).ThenBy(c => c.Page).ToList();
             using (StreamWriter writetext = new StreamWriter("result.csv"))
             {
                 writetext.WriteLine("Key,FileName,PageNo");
-                for ( int i = 0; i < result.Count; i++)
+
+                var grouped = newResult.GroupBy(p => new { p.Key, p.FileName });
+                foreach (var group in grouped)
                 {
-                    writetext.WriteLine(result[i].Key + "," + result[i].FileName + "," + result[i].Page);
+                    string record = group.Key.Key + "," + Path.GetFileName(group.Key.FileName) + ",";
+                    if (chkMultiResult.Checked) { 
+                        foreach (var product in group)
+                        {
+                            record = record + product.Page + " | ";
+                        }
+                    }
+                    else
+                    {
+                        record = record + group.First().Page;
+                    }
+                    writetext.WriteLine(record);
                 }
             }
+
+
+            /*using (StreamWriter writetext = new StreamWriter("result.csv"))
+            {
+                writetext.WriteLine("Key,FileName,PageNo");
+                for ( int i = 0; i < newResult.Count; i++)
+                {
+                    writetext.WriteLine(newResult[i].Key + "," + Path.GetFileName(newResult[i].FileName)  + "," + newResult[i].Page);
+                }
+            }*/
         }
     }
     public class Parameter
